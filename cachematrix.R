@@ -8,25 +8,26 @@
 ## cacheSolve(CM)
 ## and it will return CM's cached inverse or recalculate the inverse
 ## if CM has changed.
-## Methods for a CacheMatrix CM:
-## CM$set(Matrix), will set a new matrix for CM to hold
-## CM$get(), returns the matrix that CM holds
-## CM$setInverse(inverseMatrix), sets the inverse of CM, should be set by a call
-##                               to cacheSolve(CM), and not set by users.
-## CM$getInverse(), returns the inverse of CM, users should use cacheSolve(CM),
-##                  to check for a cached inverse.
 
 ##Creates a CacheMatrix to hold the inverse of the matrix
 ## M - the Matrix to be turned into a CacheMatrix
 makeCacheMatrix <- function(M = numeric()) {
-        inverse <- NULL
+        inverse <- NULL    # Inverse of matrix M, set to null
+        # Create functions for dealing with a CacheMatrix
+        # Method to set the matrix in a CacheMatrix, set unknown inverse to NULL
         set <- function(Y) {
                 M <<- Y
                 inverse <<- NULL
         }
+        # Method to get the matrix in a CacheMatrix
         get <- function() M
+        # Method to set the inverse a CacheMatrix
+        # Note: this inverse is set by a call to cacheSolve
         setInverse <- function(inverseMatrix) inverse <<- inverseMatrix
+        # Method to get the inverse of a CacheMatrix. Usually, the method
+        # Note: cacheSolve should be used to get the inverse.
         getInverse <- function() inverse
+        # Return a list of the functions, as the interface to a CacheMatrix
         list(set = set, get = get,
              setInverse = setInverse,
              getInverse = getInverse)
@@ -35,13 +36,18 @@ makeCacheMatrix <- function(M = numeric()) {
 ## Gets the inverse of a CacheMatrix, uses solve() to find it if it is NULL
 ## cacheMatrix - the CacheMatrix, whose inverse is returned.
 cacheSolve <- function(cacheMatrix, ...) {
+        # See if the CacheMatrix already has an inverse.
+        # If so get the Cached inverse.
         inverse <- cacheMatrix$getInverse()
         if(!is.null(inverse)) {
                 message("getting cached inverse")
                 return(inverse)
         }
+        # Otherwise, get the Matrix in the CacheMatrix
         M <- cacheMatrix$get()
+        # Find its inverse
         inverse <- solve(M, ...)
+        # Cache and return the inverse
         cacheMatrix$setInverse(inverse)
         inverse
 }
